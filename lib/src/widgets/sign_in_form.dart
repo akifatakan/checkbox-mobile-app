@@ -20,7 +20,7 @@ class SignInForm extends StatelessWidget {
         _formKey.currentState!.save();
         await userController.signInWithCredentials(_email, _password);
         if (userController.isUserSignedIn.value) {
-          Get.toNamed(Routes.home);
+          Get.offAllNamed(Routes.welcome);
         } else {
           print('Error happened');
         }

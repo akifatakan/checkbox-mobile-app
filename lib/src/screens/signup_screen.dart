@@ -8,7 +8,7 @@ class SignUpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final UserController userController = Get.put(UserController());
+    final UserController userController = Get.find<UserController>();
 
     return Scaffold(
       appBar: CustomAppBar(

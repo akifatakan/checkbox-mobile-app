@@ -23,7 +23,7 @@ class SignUpForm extends StatelessWidget {
         await userController.signUpWithCredentials(
             _email, _password, _username, _displayName);
         if (userController.isUserSignedIn.value) {
-          Get.toNamed(Routes.home);
+          Get.offAllNamed(Routes.welcome);
         } else {
           print('Error happened');
         }

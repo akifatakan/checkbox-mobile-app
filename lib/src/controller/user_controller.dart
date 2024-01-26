@@ -3,10 +3,15 @@ import 'package:get/get.dart';
 
 import '../models/models.dart';
 import '../services/services.dart';
+import 'controller.dart';
 
 class UserController extends GetxController {
   final FirebaseAuthService _authService = FirebaseAuthService();
   final FirebaseUserServices _userServices = FirebaseUserServices();
+
+  final WelcomeScreenController _welcomeController =
+      Get.find<WelcomeScreenController>();
+
   var isUserSignedIn = false.obs; // Reactive state
   Rx<UserModel?> user = Rx<UserModel?>(null); // Make 'user' reactive if needed
 
@@ -17,6 +22,7 @@ class UserController extends GetxController {
       isUserSignedIn.value = true;
       // Fetch user details and set them to 'user' observable
       user.value = await _userServices.getUserById(_user.uid);
+      _welcomeController.startTimer();
     } else {
       isUserSignedIn.value = false;
     }
@@ -34,6 +40,7 @@ class UserController extends GetxController {
         displayName: displayName,
       );
       await _userServices.createUser(newUser);
+      _welcomeController.startTimer();
       isUserSignedIn.value = true;
       user.value = newUser; // Set the created user to the 'user' observable
     } else {
@@ -60,6 +67,7 @@ class UserController extends GetxController {
       if (await _userServices.getUserById(_user.uid) == null) {
         await _userServices.createUser(newUser);
       }
+      _welcomeController.startTimer();
       isUserSignedIn.value = true;
       user.value = newUser;
     } else {
