@@ -8,5 +8,6 @@ class AppPages {
     GetPage(name: Routes.signIn, page: () => SignInScreen()),
     GetPage(name: Routes.signUp, page: () => SignUpScreen()),
     GetPage(name: Routes.welcome, page: () => WelcomeScreen()),
+    GetPage(name: Routes.createTodo, page: () => CreateTodoScreen()),
   ];
 }

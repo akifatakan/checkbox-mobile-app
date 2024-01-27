@@ -3,4 +3,5 @@ class Routes {
   static const signIn = '/signIn';
   static const signUp = '/signUp';
   static const welcome = '/welcome';
+  static const createTodo = '/createTodo';
 }

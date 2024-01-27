@@ -14,6 +14,7 @@ Future main() async {
 
   Get.put(WelcomeScreenController());
   UserController userController = Get.put(UserController());
+  Get.put(TodoController());
 
   UserModel? savedUser = await LoginCache.getUserData();
   userController.saveUserData(savedUser);

@@ -20,6 +20,7 @@ class HomeScreen extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.add_box_outlined),
             onPressed: () {
+              Get.toNamed(Routes.createTodo);
               // Action when the add icon is pressed
             },
           ),
