@@ -1,3 +1,4 @@
+import 'package:CheckBox/src/utils/login_cache.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
@@ -23,6 +24,7 @@ class UserController extends GetxController {
       // Fetch user details and set them to 'user' observable
       user.value = await _userServices.getUserById(_user.uid);
       _welcomeController.startTimer();
+      await LoginCache.saveUserData(user.value!);
     } else {
       isUserSignedIn.value = false;
     }
@@ -43,6 +45,7 @@ class UserController extends GetxController {
       _welcomeController.startTimer();
       isUserSignedIn.value = true;
       user.value = newUser; // Set the created user to the 'user' observable
+      await LoginCache.saveUserData(user.value!);
     } else {
       isUserSignedIn.value = false;
       print('Error occurred');
@@ -53,6 +56,7 @@ class UserController extends GetxController {
     await _authService.signOut();
     isUserSignedIn.value = false;
     user.value = null;
+    await LoginCache.clearUserData();
   }
 
   Future<void> signInWithGoogle() async {
@@ -70,9 +74,28 @@ class UserController extends GetxController {
       _welcomeController.startTimer();
       isUserSignedIn.value = true;
       user.value = newUser;
+      await LoginCache.saveUserData(user.value!);
     } else {
       isUserSignedIn.value = false;
       print('Error occurred');
+    }
+  }
+
+  void saveUserData(UserModel? userModel) {
+    if (userModel != null) {
+      isUserSignedIn.value = true;
+    } else {
+      isUserSignedIn.value = false;
+    }
+    user.value = userModel;
+  }
+
+  Future<void> checkCachedLogin() async {
+    UserModel? cachedUser = await LoginCache.getUserData();
+    if (cachedUser != null) {
+      user.value = cachedUser;
+      isUserSignedIn.value = true;
+      _welcomeController.startTimer(); // Start the timer
     }
   }
 }

@@ -14,9 +14,10 @@ class SignUpScreen extends StatelessWidget {
       appBar: CustomAppBar(
         title: 'Sign Up',
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SignUpForm(userController: userController),
+      body: AuthBody(
+        form: SignUpForm(
+          userController: userController,
+        ),
       ),
     );
   }

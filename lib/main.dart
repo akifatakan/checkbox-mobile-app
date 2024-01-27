@@ -2,6 +2,8 @@ import 'package:CheckBox/firebase_options.dart';
 import 'package:CheckBox/routes/app_pages.dart';
 import 'package:CheckBox/routes/routes.dart';
 import 'package:CheckBox/src/controller/controller.dart';
+import 'package:CheckBox/src/models/models.dart';
+import 'package:CheckBox/src/utils/login_cache.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,7 +13,12 @@ Future main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   Get.put(WelcomeScreenController());
-  Get.put(UserController());
+  UserController userController = Get.put(UserController());
+
+  UserModel? savedUser = await LoginCache.getUserData();
+  userController.saveUserData(savedUser);
+  userController.checkCachedLogin();
+
   runApp(const MyApp());
 }
 

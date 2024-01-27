@@ -1,3 +1,5 @@
+import 'package:CheckBox/src/commons/commons.dart';
+import 'package:CheckBox/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -22,7 +24,8 @@ class SignInForm extends StatelessWidget {
         if (userController.isUserSignedIn.value) {
           Get.offAllNamed(Routes.welcome);
         } else {
-          print('Error happened');
+          Get.snackbar('Error', 'Sign in failed',
+              snackPosition: SnackPosition.BOTTOM);
         }
       }
     }
@@ -34,10 +37,7 @@ class SignInForm extends StatelessWidget {
         children: <Widget>[
           const SizedBox(height: 16.0),
           TextFormField(
-            decoration: const InputDecoration(
-              labelText: 'Email',
-              border: OutlineInputBorder(),
-            ),
+            decoration: AuthInputDecoration.getDecoration(labelText: 'Email'),
             keyboardType: TextInputType.emailAddress,
             onSaved: (value) => _email = value ?? '',
             validator: (value) {
@@ -46,13 +46,12 @@ class SignInForm extends StatelessWidget {
               }
               return null;
             },
+            style: TextStyle(color: Colors.white),
           ),
           const SizedBox(height: 16.0),
           TextFormField(
-            decoration: const InputDecoration(
-              labelText: 'Password',
-              border: OutlineInputBorder(),
-            ),
+            decoration:
+                AuthInputDecoration.getDecoration(labelText: 'Password'),
             obscureText: true,
             onSaved: (value) => _password = value ?? '',
             validator: (value) {
@@ -61,12 +60,10 @@ class SignInForm extends StatelessWidget {
               }
               return null;
             },
+            style: TextStyle(color: Colors.white),
           ),
           const SizedBox(height: 24.0),
-          ElevatedButton(
-            onPressed: submitForm,
-            child: const Text('Sign In'),
-          ),
+          AuthButton(onPressed: submitForm, label: 'Sign In')
         ],
       ),
     );

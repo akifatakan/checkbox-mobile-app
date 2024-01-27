@@ -24,12 +24,12 @@ class UserModel {
   }
 
   // Creates a User object from a map (JSON).
-  factory UserModel.fromMap(Map<String, dynamic> map) {
+  factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: map['id'] ?? '',
-      email: map['email'] ?? '',
-      username: map['username'] ?? '',
-      displayName: map['displayName'] ?? '',
+      id: json['id'] ?? '',
+      email: json['email'] ?? '',
+      username: json['username'] ?? '',
+      displayName: json['displayName'] ?? '',
     );
   }
 

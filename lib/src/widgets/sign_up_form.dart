@@ -1,7 +1,9 @@
+import 'package:CheckBox/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../routes/routes.dart';
+import '../commons/commons.dart';
 import '../controller/controller.dart';
 
 class SignUpForm extends StatelessWidget {
@@ -36,10 +38,8 @@ class SignUpForm extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           TextFormField(
-            decoration: const InputDecoration(
-              labelText: 'Username',
-              border: OutlineInputBorder(),
-            ),
+            decoration:
+                AuthInputDecoration.getDecoration(labelText: 'Username'),
             onSaved: (value) => _username = value ?? '',
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -47,13 +47,12 @@ class SignUpForm extends StatelessWidget {
               }
               return null;
             },
+            style: TextStyle(color: Colors.white),
           ),
           const SizedBox(height: 16.0),
           TextFormField(
-            decoration: const InputDecoration(
-              labelText: 'Display Name',
-              border: OutlineInputBorder(),
-            ),
+            decoration:
+                AuthInputDecoration.getDecoration(labelText: 'Display Name'),
             onSaved: (value) => _displayName = value ?? '',
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -61,13 +60,11 @@ class SignUpForm extends StatelessWidget {
               }
               return null;
             },
+            style: TextStyle(color: Colors.white),
           ),
           const SizedBox(height: 16.0),
           TextFormField(
-            decoration: const InputDecoration(
-              labelText: 'Email',
-              border: OutlineInputBorder(),
-            ),
+            decoration: AuthInputDecoration.getDecoration(labelText: 'Email'),
             keyboardType: TextInputType.emailAddress,
             onSaved: (value) => _email = value ?? '',
             validator: (value) {
@@ -76,13 +73,12 @@ class SignUpForm extends StatelessWidget {
               }
               return null;
             },
+            style: TextStyle(color: Colors.white),
           ),
           const SizedBox(height: 16.0),
           TextFormField(
-            decoration: const InputDecoration(
-              labelText: 'Password',
-              border: OutlineInputBorder(),
-            ),
+            decoration:
+                AuthInputDecoration.getDecoration(labelText: 'Password'),
             obscureText: true,
             onSaved: (value) => _password = value ?? '',
             validator: (value) {
@@ -91,12 +87,10 @@ class SignUpForm extends StatelessWidget {
               }
               return null;
             },
+            style: TextStyle(color: Colors.white),
           ),
           const SizedBox(height: 24.0),
-          ElevatedButton(
-            onPressed: submitForm,
-            child: const Text('Sign Up'),
-          ),
+          AuthButton(onPressed: submitForm, label: 'Sign Up')
         ],
       ),
     );
