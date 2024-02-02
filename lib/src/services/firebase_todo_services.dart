@@ -6,9 +6,11 @@ class FirebaseTodoServices {
       FirebaseFirestore.instance.collection('todos');
 
   Future<void> createTodo(Todo todo) async {
+    List<String> tags = todo.tags;
     DocumentReference docRef = await _todoCollection.add(todo.toJson());
     todo.id = docRef.id;
-    await updateTodo(todo);
+    todo.tags = tags;
+    //await updateTodo(todo);
   }
 
   // Read (get) a todo by ID
@@ -32,7 +34,7 @@ class FirebaseTodoServices {
 
   Future<List<Todo>> getTodosFromFirestore(String userId) async {
     QuerySnapshot querySnapshot =
-        await _todoCollection.where('userId', isEqualTo: userId).get();
+        await _todoCollection.where('userId', isEqualTo: userId).where('status', isEqualTo: 'active').get();
 
     return querySnapshot.docs.map((doc) {
       Map<String, dynamic> data = doc.data() as Map<String, dynamic>;

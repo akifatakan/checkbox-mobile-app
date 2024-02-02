@@ -9,6 +9,7 @@ class Todo {
   String priority;
   DateTime dueDate;
   String category;
+  String status;
   List<String> tags;
   String? attachment; // Optional attachment (could be a file path or URL)
 
@@ -21,6 +22,7 @@ class Todo {
     required this.dueDate,
     required this.category,
     required this.tags,
+    required this.status,
     this.attachment,
   });
 
@@ -35,40 +37,57 @@ class Todo {
       'category': category,
       'tags': tags,
       'attachment': attachment,
+      'status': status
     };
   }
 
   // Create a Todo object from a map.
   factory Todo.fromJson(Map<String, dynamic> json) {
     return Todo(
-      id: json['id'],
-      userId: json['userId'],
-      title: json['title'],
-      note: json['note'],
-      priority: json['priority'],
-      dueDate: DateTime.parse(json['dueDate']),
-      category: json['category'],
-      tags: List<String>.from(json['tags']),
-      attachment: json['attachment'],
-    );
+        id: json['id'],
+        userId: json['userId'],
+        title: json['title'],
+        note: json['note'],
+        priority: json['priority'],
+        dueDate: DateTime.parse(json['dueDate']),
+        category: json['category'],
+        tags: List<String>.from(json['tags']),
+        attachment: json['attachment'],
+        status: json['status']);
   }
 
   factory Todo.fromSnapshot(DocumentSnapshot snapshot) {
     Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
     return Todo(
-      id: snapshot.id ?? '',
-      userId: snapshot['userId'] ?? '',
-      title: snapshot['title'] ?? '',
-      note: snapshot['note'] ?? '',
-      priority: snapshot['priority'] ?? '',
-      dueDate: DateTime.parse(snapshot['dueDate']),
-      category: snapshot['category'] ?? '',
-      tags: List<String>.from(snapshot['tags']),
-      attachment: snapshot['attachment'],
-    );
+        id: snapshot.id ?? '',
+        userId: snapshot['userId'] ?? '',
+        title: snapshot['title'] ?? '',
+        note: snapshot['note'] ?? '',
+        priority: snapshot['priority'] ?? '',
+        dueDate: DateTime.parse(snapshot['dueDate']),
+        category: snapshot['category'] ?? '',
+        tags: List<String>.from(snapshot['tags']),
+        attachment: snapshot['attachment'],
+        status: snapshot['status'] ?? '');
   }
+
   @override
   String toString() {
-    return 'id: $id\nuserId: $userId\ntitle: $title\nnote: $note\npriority: $priority\ndueDate: ${DateFormat('yyyy-MM-dd').format(dueDate)}\ncategory: $category\n tags: ${tags.toString()}\nattachment: ${attachment ?? ''}';
+    return 'id: $id\nuserId: $userId\ntitle: $title\nnote: $note\npriority: $priority\ndueDate: ${DateFormat('yyyy-MM-dd').format(dueDate)}\ncategory: $category\n tags: ${tags.toString()}\nattachment: ${attachment ?? ''}\n status: $status';
+  }
+
+  Todo copyWith(Todo todo) {
+    Todo newTodo = Todo(
+        userId: todo.userId,
+        title: todo.title,
+        note: todo.note,
+        priority: todo.priority,
+        dueDate: todo.dueDate,
+        category: todo.category,
+        tags: todo.tags,
+        status: todo.status,
+        attachment: todo.attachment,
+        id: todo.id);
+    return newTodo;
   }
 }

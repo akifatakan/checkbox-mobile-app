@@ -9,7 +9,7 @@ import '../controller/controller.dart';
 class SignUpForm extends StatelessWidget {
   final UserController userController;
 
-  SignUpForm({Key? key, required this.userController}) : super(key: key);
+  const SignUpForm({Key? key, required this.userController}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
