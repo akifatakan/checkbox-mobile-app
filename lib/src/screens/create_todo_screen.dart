@@ -12,6 +12,7 @@ class CreateTodoScreen extends StatelessWidget {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TodoController todoController = Get.find<TodoController>();
   final UserController userController = Get.find<UserController>();
+  final NavigationController navigationController = Get.find<NavigationController>();
 
   void submitForm() {
     if (_formKey.currentState!.validate()) {
@@ -20,6 +21,7 @@ class CreateTodoScreen extends StatelessWidget {
       todoController.createTodo();
       _formKey.currentState!.reset();
       Get.offAllNamed(Routes.home);
+      navigationController.setCurrentIndex(0);
     }
   }
 
@@ -39,6 +41,7 @@ class CreateTodoScreen extends StatelessWidget {
       // Add other categories and their tags...
     };
     return Scaffold(
+      bottomNavigationBar: CustomBottomNavigationBar(),
       appBar: CustomAppBar(title: 'New Todo'),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),

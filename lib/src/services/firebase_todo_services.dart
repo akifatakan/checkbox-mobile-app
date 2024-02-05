@@ -32,9 +32,9 @@ class FirebaseTodoServices {
     await _todoCollection.doc(todoId).delete();
   }
 
-  Future<List<Todo>> getTodosFromFirestore(String userId) async {
+  Future<List<Todo>> getTodosFromFirestoreByStatus(String userId, String status) async {
     QuerySnapshot querySnapshot =
-        await _todoCollection.where('userId', isEqualTo: userId).where('status', isEqualTo: 'active').get();
+        await _todoCollection.where('userId', isEqualTo: userId).where('status', isEqualTo: status).get();
 
     return querySnapshot.docs.map((doc) {
       Map<String, dynamic> data = doc.data() as Map<String, dynamic>;

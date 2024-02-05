@@ -24,7 +24,8 @@ class TodoController extends GetxController {
 
   //for todoList
   var todos = RxList<Todo>();
-
+  var completedTodos = RxList<Todo>();
+  var overdueTodos = RxList<Todo>();
   //for todoDetails
   var isEditMode = false.obs;
 
@@ -110,13 +111,30 @@ class TodoController extends GetxController {
     tags.assignAll(tagList);
   }
 
-  void fetchTodos(String userId) async {
+  Future<void> fetchTodos(String userId) async {
     isFetched.value = false;
-    todos.value = await _todoServices.getTodosFromFirestore(userId);
+    todos.value = await _todoServices.getTodosFromFirestoreByStatus(userId, 'active');
     filterPassedTodos();
     todos.value = _groupAndSortTodos(todos.value);
     isFetched.value = true;
   }
+
+  Future<void> fetchCompletedTodos(String userId) async {
+    isFetched.value = false;
+    completedTodos.value = await _todoServices.getTodosFromFirestoreByStatus(userId, 'complete');
+    completedTodos.value = _groupAndSortTodos(completedTodos.value);
+    isFetched.value = true;
+  }
+
+  Future<void> fetchOverdueTodos(String userId) async {
+    isFetched.value = false;
+    overdueTodos.value = await _todoServices.getTodosFromFirestoreByStatus(userId, 'active');
+    getOverdueTodos();
+    overdueTodos.value = _groupAndSortTodos(overdueTodos.value);
+    isFetched.value = true;
+  }
+
+
 
   void filterPassedTodos() {
     DateTime today = DateTime.now();
@@ -125,6 +143,15 @@ class TodoController extends GetxController {
           .isAfter(DateTime(today.year, today.month, today.day - 1));
     }).toList();
   }
+
+  void getOverdueTodos() {
+    DateTime today = DateTime.now();
+    overdueTodos.value = overdueTodos.value.where((todo) {
+      return todo.dueDate
+          .isBefore(DateTime(today.year, today.month, today.day));
+    }).toList();
+  }
+
 
   List<Todo> _groupAndSortTodos(List<Todo> todos) {
     const priorityOrder = {'High': 1, 'Medium': 2, 'Low': 3};
@@ -143,13 +170,14 @@ class TodoController extends GetxController {
 
   Future<void> deleteTodoOfUserByID(String userId, String todoId) async {
     await _todoServices.deleteTodo(todoId);
-    fetchTodos(userId);
+    await fetchTodos(userId);
   }
 
   Future<void> markTodoAsComplete(String userId, String todoId) async {
     Todo? todo = await _todoServices.getTodoById(todoId);
     todo!.status = 'complete';
-    _todoServices.updateTodo(todo);
+    await _todoServices.updateTodo(todo);
+    await fetchTodos(userId);
   }
 
   Future<Todo> getTodoByID(String todoId) async {

@@ -4,3 +4,8 @@ export 'signin_screen.dart';
 export 'signup_screen.dart';
 export 'welcome_screen.dart';
 export 'todo_details_screen.dart';
+export 'notifications_screen.dart';
+export 'profile_screen.dart';
+export 'search_screen.dart';
+export 'completed_todos_screen.dart';
+export 'overdue_todos_screen.dart';

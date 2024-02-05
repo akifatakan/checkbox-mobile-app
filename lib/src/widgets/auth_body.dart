@@ -30,7 +30,7 @@ class AuthBody extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(35),
                 child: Image.asset(
-                  'lib/assets/checkbox_logo.png', // Your logo here
+                  'lib/assets/checkbox_logo.png',
                   width: MediaQuery.of(context).size.width * 0.5,
                 ),
               ),

@@ -12,6 +12,7 @@ Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
+  Get.put(NavigationController());
   Get.put(WelcomeScreenController());
   UserController userController = Get.put(UserController());
   Get.put(TodoController());
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: Routes.welcome,
       getPages: AppPages.pages,
-      transitionDuration: Duration(milliseconds: 100),
+      transitionDuration: Duration(milliseconds: 0),
     );
   }
 }
