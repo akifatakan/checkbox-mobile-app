@@ -74,7 +74,6 @@ class TodoSearchDelegate extends SearchDelegate<Todo?> {
             title: Text(todo.title),
             subtitle: Text(todo.note),
             onTap: () {
-              print('def');
               Get.to(() => TodoDetailsScreen(todo: todo));
             },
           );
@@ -100,7 +99,6 @@ class TodoSearchDelegate extends SearchDelegate<Todo?> {
           title: Text(todo.title),
           subtitle: Text(todo.note),
           onTap: () {
-            print("abc");
             Get.to(() => TodoDetailsScreen(todo: todo));
           },
         );
