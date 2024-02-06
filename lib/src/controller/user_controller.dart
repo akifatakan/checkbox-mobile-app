@@ -1,6 +1,8 @@
+import 'package:CheckBox/src/screens/screens.dart';
 import 'package:CheckBox/src/utils/login_cache.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:local_auth/local_auth.dart';
 
 import '../models/models.dart';
 import '../services/services.dart';
@@ -15,6 +17,19 @@ class UserController extends GetxController {
 
   var isUserSignedIn = false.obs; // Reactive state
   Rx<UserModel?> user = Rx<UserModel?>(null); // Make 'user' reactive if needed
+
+  var isBiometricEnabled = false.obs;
+
+  @override
+  void onInit() async {
+    super.onInit();
+    isBiometricEnabled.value = await LoginCache.getBiometricPreference();
+  }
+
+  void toggleBiometric(bool value) async {
+    await LoginCache.saveBiometricPreference(value);
+    isBiometricEnabled.value = value;
+  }
 
   Future<void> signInWithCredentials(String email, String password) async {
     User? _user =
@@ -57,6 +72,7 @@ class UserController extends GetxController {
     isUserSignedIn.value = false;
     user.value = null;
     await LoginCache.clearUserData();
+    await LoginCache.saveBiometricPreference(false);
   }
 
   Future<void> signInWithGoogle() async {
@@ -92,10 +108,43 @@ class UserController extends GetxController {
 
   Future<void> checkCachedLogin() async {
     UserModel? cachedUser = await LoginCache.getUserData();
-    if (cachedUser != null) {
-      user.value = cachedUser;
-      isUserSignedIn.value = true;
-      _welcomeController.startTimer(); // Start the timer
+    bool biometricValue = await LoginCache.getBiometricPreference();
+    if (biometricValue && cachedUser != null) {
+      bool authenticated = await authenticateWithBiometrics();
+      if  (authenticated) {
+        user.value = cachedUser;
+        isUserSignedIn.value = true;
+        _welcomeController.startTimer(); // Start the timer
+      } else {
+        print("You are not authenticated");
+        signOut();
+        Get.to(() => (WelcomeScreen()));
+      }
+    } else {
+      signOut();
     }
+  }
+
+  Future<bool> authenticateWithBiometrics() async {
+    final LocalAuthentication auth = LocalAuthentication();
+    bool canCheckBiometrics = await auth.canCheckBiometrics;
+    bool authenticated = false;
+
+    if (canCheckBiometrics) {
+      try {
+        // Try to authenticate with biometrics
+        authenticated = await auth.authenticate(
+          localizedReason:
+              'Scan your fingerprint (or face or whatever) to authenticate',
+          options: const AuthenticationOptions(
+            biometricOnly: true,
+          ),
+        );
+      } catch (e) {
+        print(e); // Handle the error
+      }
+    }
+
+    return authenticated;
   }
 }

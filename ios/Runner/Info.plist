@@ -60,5 +60,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSFaceIDUsageDescription</key>
+    <string>This app requires biometric authentication to allow login without password or google.</string>
+    <key>NSBiometryUsageDescription</key>
+    <string>This app uses biometrics for authentication</string>
 </dict>
 </plist>

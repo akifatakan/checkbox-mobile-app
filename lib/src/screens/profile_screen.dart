@@ -50,6 +50,16 @@ class ProfileScreen extends StatelessWidget {
                 Get.offAllNamed(Routes.welcome);
               },
             ),
+            Obx(() => ListTile(
+              leading: Icon(Icons.fingerprint),
+              title: Text('Biometric Authentication'),
+              trailing: Switch(
+                value: _userController.isBiometricEnabled.value,
+                onChanged: (value) {
+                  _userController.toggleBiometric(value);
+                },
+              ),
+            )),
           ],
         ).toList(),
       ),    );
