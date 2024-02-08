@@ -1,0 +1,1 @@
+enum FilePickType { image, file }
