@@ -11,7 +11,7 @@ class Todo {
   String category;
   String status;
   List<String> tags;
-  String? attachment; // Optional attachment (could be a file path or URL)
+  List<String>? attachments; // Optional attachment (could be a file path or URL)
 
   Todo({
     this.id,
@@ -23,7 +23,7 @@ class Todo {
     required this.category,
     required this.tags,
     required this.status,
-    this.attachment,
+    this.attachments,
   });
 
   // Convert a Todo object into a map.
@@ -36,7 +36,7 @@ class Todo {
       'dueDate': dueDate.toIso8601String(),
       'category': category,
       'tags': tags,
-      'attachment': attachment,
+      'attachments': attachments,
       'status': status
     };
   }
@@ -52,7 +52,7 @@ class Todo {
         dueDate: DateTime.parse(json['dueDate']),
         category: json['category'],
         tags: List<String>.from(json['tags']),
-        attachment: json['attachment'],
+        attachments: List<String>.from(json['attachments']),
         status: json['status']);
   }
 
@@ -67,13 +67,13 @@ class Todo {
         dueDate: DateTime.parse(snapshot['dueDate']),
         category: snapshot['category'] ?? '',
         tags: List<String>.from(snapshot['tags']),
-        attachment: snapshot['attachment'],
+        attachments: List<String>.from(snapshot['attachments']),
         status: snapshot['status'] ?? '');
   }
 
   @override
   String toString() {
-    return 'id: $id\nuserId: $userId\ntitle: $title\nnote: $note\npriority: $priority\ndueDate: ${DateFormat('yyyy-MM-dd').format(dueDate)}\ncategory: $category\n tags: ${tags.toString()}\nattachment: ${attachment ?? ''}\n status: $status';
+    return 'id: $id\nuserId: $userId\ntitle: $title\nnote: $note\npriority: $priority\ndueDate: ${DateFormat('yyyy-MM-dd').format(dueDate)}\ncategory: $category\n tags: ${tags.toString()}\nattachments: ${attachments.toString() ?? ''}\n status: $status';
   }
 
   Todo copyWith(Todo todo) {
@@ -86,7 +86,7 @@ class Todo {
         category: todo.category,
         tags: todo.tags,
         status: todo.status,
-        attachment: todo.attachment,
+        attachments: todo.attachments,
         id: todo.id);
     return newTodo;
   }

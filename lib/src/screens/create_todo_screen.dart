@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:CheckBox/src/commons/commons.dart';
 import 'package:CheckBox/src/controller/controller.dart';
+import 'package:CheckBox/src/screens/photo_view_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -85,8 +86,9 @@ class CreateTodoScreen extends StatelessWidget {
       }
 
       if (selectedFile != null) {
-        todoController.attachment.value =
-            await todoController.uploadFile(selectedFile);
+        todoController.attachments.add(
+            await todoController.uploadFile(selectedFile));
+
         // And handle the upload result as needed
       }
 
@@ -292,22 +294,15 @@ class CreateTodoScreen extends StatelessWidget {
                   );
                 }),
               ),
-              Obx(() => todoController.attachment.value != ''
+              Obx(() => todoController.attachments.isNotEmpty
                   ? Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
                       child: Wrap(
                         spacing: 10.0,
                         runSpacing: 10.0,
-                        children: [
-                          todoController.attachment.value
-                                  .split('/')
-                                  .last
-                                  .contains('image_picker_')
-                              ? ImageAttachmentCart(
-                                  todoController: todoController)
-                              : FileAttachmentCart(
-                                  todoController: todoController),
-                        ],
+                        children: todoController.attachments.map((attachment) {
+                          return attachment.split('/').last.contains('image_picker_') ? ImageAttachmentCart(todoController: todoController, attachmentUrl: attachment,) : FileAttachmentCart(todoController: todoController, attachmentUrl: attachment);
+                        }).toList(),
                       ))
                   : SizedBox.shrink()),
               Obx(
@@ -352,141 +347,4 @@ class CreateTodoScreen extends StatelessWidget {
   }
 }
 
-class ImageAttachmentCart extends StatelessWidget {
-  const ImageAttachmentCart({
-    Key? key,
-    required this.todoController,
-  }) : super(key: key);
 
-  final TodoController todoController;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      // Allow overflow for positioned elements
-      children: [
-        SizedBox(
-          width: 125,
-          height: 125,
-          child: Image.network(
-            todoController.attachment.value,
-            fit: BoxFit.cover, // Ensure the image covers the SizedBox area
-            // Other properties...
-          ),
-        ),
-        Positioned(
-          right: -10,
-          // Adjust the position to your preference
-          top: -10,
-          // Adjust the position to your preference
-          child: InkWell(
-            onTap: () async {
-              await todoController.deleteFileFromFirebaseWithUrl(
-                  todoController.attachment.value);
-              todoController.attachment.value = '';
-            },
-            child: Container(
-              padding: EdgeInsets.all(2),
-              // Adjust the padding to your preference
-              decoration: BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
-                border: Border.all(
-                    width: 2,
-                    color: Colors
-                        .white), // Add a border to separate the button from the image
-              ),
-              child: Icon(Icons.close,
-                  color: Colors.white,
-                  size: 16), // Adjust the icon size to your preference
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class FileAttachmentCart extends StatelessWidget {
-  const FileAttachmentCart({
-    Key? key,
-    required this.todoController,
-  }) : super(key: key);
-
-  final TodoController todoController;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      // Allow overflow for positioned elements
-      children: [
-        SizedBox(
-          width: 125,
-          height: 125,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.insert_drive_file,
-                // Replace with an appropriate icon or thumbnail for files
-                size: 48,
-                // Adjust the size to your preference
-                color: Colors.grey, // Adjust the color to your preference
-              ),
-              Flexible(
-                child: Text(
-                  Uri.decodeFull(
-                          Uri.parse(todoController.attachment.value).path)
-                      .split('/')
-                      .last
-                      .substring(Uri.decodeFull(
-                                  Uri.parse(todoController.attachment.value)
-                                      .path)
-                              .split('/')
-                              .last
-                              .indexOf('-') +
-                          'file_picker_'.length +
-                          1),
-                  overflow: TextOverflow.ellipsis,
-                  // Add overflow property
-                  style:
-                      TextStyle(fontSize: 12), // Adjust font size if necessary
-                ),
-              ),
-            ],
-          ),
-        ),
-        Positioned(
-          right: -10,
-          // Adjust the position to your preference
-          top: -10,
-          // Adjust the position to your preference
-          child: InkWell(
-            onTap: () async {
-              await todoController.deleteFileFromFirebaseWithUrl(
-                  todoController.attachment.value);
-              todoController.attachment.value = '';
-            },
-            child: Container(
-              padding: EdgeInsets.all(2),
-              // Adjust the padding to your preference
-              decoration: BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
-                border: Border.all(
-                    width: 2,
-                    color: Colors
-                        .white), // Add a border to separate the button from the file representation
-              ),
-              child: Icon(Icons.close,
-                  color: Colors.white,
-                  size: 16), // Adjust the icon size to your preference
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}

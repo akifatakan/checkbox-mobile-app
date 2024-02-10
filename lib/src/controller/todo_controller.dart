@@ -20,7 +20,7 @@ class TodoController extends GetxController {
           .obs;
   var category = 'Work'.obs;
   var tags = <String>[].obs;
-  var attachment = ''.obs;
+  var attachments = <String>[].obs;
 
   var isFetched = false.obs;
 
@@ -63,7 +63,7 @@ class TodoController extends GetxController {
         DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
     category.value = 'Work';
     tags.value = [];
-    attachment.value = '';
+    attachments.value = [];
   }
 
   void createTodo() async {
@@ -74,8 +74,9 @@ class TodoController extends GetxController {
         priority: priority.value,
         dueDate: dueDate.value,
         category: category.value,
-        tags: tags,
-        status: 'active');
+        tags: tags.value,
+        status: 'active',
+        attachments: attachments.value);
     await _todoServices.createTodo(todo);
     initializeTodo();
   }
@@ -91,7 +92,8 @@ class TodoController extends GetxController {
         dueDate: dueDate.value,
         category: category.value,
         tags: tags.value,
-        status: oldTodo!.status);
+        status: oldTodo!.status,
+        attachments: attachments.value);
     await _todoServices.updateTodo(todo);
     initializeTodo();
   }
