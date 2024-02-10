@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:CheckBox/src/controller/controller.dart';
 import 'package:CheckBox/src/services/services.dart';
 import 'package:get/get.dart';
@@ -18,7 +20,7 @@ class TodoController extends GetxController {
           .obs;
   var category = 'Work'.obs;
   var tags = <String>[].obs;
-  var attachment = ''.obs;
+  var attachments = <String>[].obs;
 
   var isFetched = false.obs;
 
@@ -26,6 +28,7 @@ class TodoController extends GetxController {
   var todos = RxList<Todo>();
   var completedTodos = RxList<Todo>();
   var overdueTodos = RxList<Todo>();
+
   //for todoDetails
   var isEditMode = false.obs;
 
@@ -60,7 +63,7 @@ class TodoController extends GetxController {
         DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
     category.value = 'Work';
     tags.value = [];
-    attachment.value = '';
+    attachments.value = [];
   }
 
   void createTodo() async {
@@ -71,8 +74,9 @@ class TodoController extends GetxController {
         priority: priority.value,
         dueDate: dueDate.value,
         category: category.value,
-        tags: tags,
-        status: 'active');
+        tags: tags.value,
+        status: 'active',
+        attachments: attachments.value);
     await _todoServices.createTodo(todo);
     initializeTodo();
   }
@@ -88,7 +92,8 @@ class TodoController extends GetxController {
         dueDate: dueDate.value,
         category: category.value,
         tags: tags.value,
-        status: oldTodo!.status);
+        status: oldTodo!.status,
+        attachments: attachments.value);
     await _todoServices.updateTodo(todo);
     initializeTodo();
   }
@@ -113,7 +118,8 @@ class TodoController extends GetxController {
 
   Future<void> fetchTodos(String userId) async {
     isFetched.value = false;
-    todos.value = await _todoServices.getTodosFromFirestoreByStatus(userId, 'active');
+    todos.value =
+        await _todoServices.getTodosFromFirestoreByStatus(userId, 'active');
     filterPassedTodos();
     todos.value = _groupAndSortTodos(todos.value);
     isFetched.value = true;
@@ -121,20 +127,20 @@ class TodoController extends GetxController {
 
   Future<void> fetchCompletedTodos(String userId) async {
     isFetched.value = false;
-    completedTodos.value = await _todoServices.getTodosFromFirestoreByStatus(userId, 'complete');
+    completedTodos.value =
+        await _todoServices.getTodosFromFirestoreByStatus(userId, 'complete');
     completedTodos.value = _groupAndSortTodos(completedTodos.value);
     isFetched.value = true;
   }
 
   Future<void> fetchOverdueTodos(String userId) async {
     isFetched.value = false;
-    overdueTodos.value = await _todoServices.getTodosFromFirestoreByStatus(userId, 'active');
+    overdueTodos.value =
+        await _todoServices.getTodosFromFirestoreByStatus(userId, 'active');
     getOverdueTodos();
     overdueTodos.value = _groupAndSortTodos(overdueTodos.value);
     isFetched.value = true;
   }
-
-
 
   void filterPassedTodos() {
     DateTime today = DateTime.now();
@@ -151,7 +157,6 @@ class TodoController extends GetxController {
           .isBefore(DateTime(today.year, today.month, today.day));
     }).toList();
   }
-
 
   List<Todo> _groupAndSortTodos(List<Todo> todos) {
     const priorityOrder = {'High': 1, 'Medium': 2, 'Low': 3};
@@ -183,5 +188,14 @@ class TodoController extends GetxController {
   Future<Todo> getTodoByID(String todoId) async {
     Todo? todo = await _todoServices.getTodoById(todoId);
     return todo!;
+  }
+
+  Future<String> uploadFile(File file) async {
+    String? filename = await _todoServices.uploadFile(file);
+    return filename ?? '';
+  }
+
+  Future<void> deleteFileFromFirebaseWithUrl(String fileUrl) async {
+    await _todoServices.deleteImageFromFirebase(fileUrl);
   }
 }

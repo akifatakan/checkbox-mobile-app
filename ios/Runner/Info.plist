@@ -64,5 +64,7 @@
     <string>This app requires biometric authentication to allow login without password or google.</string>
     <key>NSBiometryUsageDescription</key>
     <string>This app uses biometrics for authentication</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Checkbox requires to reach gallery to select a photo</string>
 </dict>
 </plist>

@@ -1,10 +1,15 @@
+import 'dart:io';
+
 import 'package:CheckBox/src/controller/controller.dart';
 import 'package:CheckBox/src/widgets/widgets.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import '../../routes/routes.dart';
 import '../commons/commons.dart';
+import '../commons/enums.dart';
 import '../models/todo.dart';
 
 class TodoDetailsScreen extends StatelessWidget {
@@ -15,6 +20,8 @@ class TodoDetailsScreen extends StatelessWidget {
   final UserController userController = Get.find<UserController>();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool isFormChanged = false;
+  var isLoading = false.obs;
+  var attachments = <String>[].obs;
 
   void submitForm() {
     if (_formKey.currentState!.validate()) {
@@ -28,8 +35,69 @@ class TodoDetailsScreen extends StatelessWidget {
     }
   }
 
+  Future<File?> pickFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      return File(result.files.single.path!);
+    }
+    return null;
+  }
+
+  Future<File?> pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      return File(pickedFile.path);
+    }
+    return null;
+  }
+
+  void _uploadFile() async {
+    final result = await showDialog<FilePickType>(
+      context: Get.context!,
+      builder: (context) => AlertDialog(
+        title: Text('Upload Attachment'),
+        content: Text('Please select what you want to upload.'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context, FilePickType.image),
+            child: Text('Image'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, FilePickType.file),
+            child: Text('File'),
+          ),
+        ],
+      ),
+    );
+
+    if (result != null) {
+      isLoading.value = true;
+      File? selectedFile;
+
+      switch (result) {
+        case FilePickType.image:
+          selectedFile = await pickImage();
+          break;
+        case FilePickType.file:
+          selectedFile = await pickFile();
+          break;
+      }
+
+      if (selectedFile != null) {
+        todo.attachments!.add(await todoController.uploadFile(selectedFile));
+        attachments.value = todo.attachments!;
+        // And handle the upload result as needed
+      }
+
+      isLoading.value = false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    attachments = todo.attachments!.obs;
     Map<String, List<String>> categoryTags = {
       'Work': [
         'Urgent',
@@ -283,34 +351,71 @@ class TodoDetailsScreen extends StatelessWidget {
                               ),
                             ),
                     ),
-
                     Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6.0),
-                        child: Obx(() {
-                          var currentTags =
-                              categoryTags[selectedCategory.value] ?? [];
-                          return Wrap(
-                            spacing: 8.0, // Spacing between chips
-                            children: currentTags.map((tag) {
-                              return ChoiceChip(
-                                label: Text(tag),
-                                selected: selectedTags.contains(tag),
-                                onSelected: !todoController.isEditMode.value
-                                    ? null
-                                    : (selected) {
-                                        if (selected) {
-                                          if (!selectedTags.contains(tag))
-                                            selectedTags.add(tag);
-                                        } else {
-                                          selectedTags.remove(tag);
-                                        }
-                                      },
-                              );
-                            }).toList(),
-                          );
-                        })),
-                    // ... Repeat for other fields like note, priority, etc. ...
-
+                      padding: const EdgeInsets.symmetric(vertical: 6.0),
+                      child: Obx(() {
+                        var currentTags =
+                            categoryTags[selectedCategory.value] ?? [];
+                        return Wrap(
+                          spacing: 8.0, // Spacing between chips
+                          children: currentTags.map((tag) {
+                            return ChoiceChip(
+                              label: Text(tag),
+                              selected: selectedTags.contains(tag),
+                              onSelected: !todoController.isEditMode.value
+                                  ? null
+                                  : (selected) {
+                                      if (selected) {
+                                        if (!selectedTags.contains(tag))
+                                          selectedTags.add(tag);
+                                      } else {
+                                        selectedTags.remove(tag);
+                                      }
+                                    },
+                            );
+                          }).toList(),
+                        );
+                      }),
+                    ),
+                    Obx(() => attachments.value != null &&
+                            attachments.value.isNotEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Wrap(
+                              spacing: 10.0,
+                              runSpacing: 10.0,
+                              children: attachments.value.map((attachment) {
+                                return attachment
+                                        .split('/')
+                                        .last
+                                        .contains('image_picker_')
+                                    ? ImageAttachmentCart(
+                                        todoController: todoController,
+                                        attachmentUrl: attachment,
+                                        isEditable:
+                                            todoController.isEditMode.value,
+                                      )
+                                    : FileAttachmentCart(
+                                        todoController: todoController,
+                                        isEditable:
+                                            todoController.isEditMode.value,
+                                        attachmentUrl: attachment);
+                              }).toList(),
+                            ))
+                        : SizedBox.shrink()),
+                    Obx(
+                      () => todoController.isEditMode.value
+                          ? isLoading.value
+                              ? ElevatedButton(
+                                  onPressed: () {},
+                                  child: Center(
+                                      child: CircularProgressIndicator()))
+                              : ElevatedButton.icon(
+                                  icon: Icon(Icons.attachment),
+                                  label: Text('Pick an Attachment'),
+                                  onPressed: _uploadFile)
+                          : SizedBox.shrink(),
+                    ),
                     Obx(
                       () => todoController.isEditMode.value
                           ? ListTile(

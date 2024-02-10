@@ -9,3 +9,4 @@ export 'profile_screen.dart';
 export 'search_screen.dart';
 export 'completed_todos_screen.dart';
 export 'overdue_todos_screen.dart';
+export 'photo_view_screen.dart';
